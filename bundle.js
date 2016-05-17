@@ -24,7 +24,9 @@ var Merge = (function () {
     Merge.merge = function (files, main) {
         this.files = files;
         this.used = 0;
-        return this.analyze(this.fileByName(main));
+        var result = this.analyze(this.fileByName(main));
+        this.checkFiles();
+        return this.appendTimestamp(result);
     };
     Merge.fileByName = function (name) {
         for (var _i = 0, _a = this.files; _i < _a.length; _i++) {
@@ -36,23 +38,28 @@ var Merge = (function () {
         }
         throw "file not found: " + name;
     };
+    Merge.appendTimestamp = function (contents) {
+        return contents +
+            "****************************************************\n" +
+            "* abapmerge - " + new Date().toJSON() + "\n" +
+            "****************************************************\n";
+    };
     Merge.analyze = function (contents) {
         var output = "";
         var lines = contents.split("\n");
         for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
             var line = lines_1[_i];
-            var include = line.match(/^\s?INCLUDE\s+(\w+)\s*.\s*$/i);
+            var include = line.match(/^\s?INCLUDE\s+(z\w+)\s*.\s*$/i);
             if (include) {
                 output = output +
                     this.comment(include[1]) +
-                    this.fileByName(include[1]) +
+                    this.analyze(this.fileByName(include[1])) +
                     "\n";
             }
             else {
                 output = output + line + "\n";
             }
         }
-        this.checkFiles();
         return output;
     };
     Merge.checkFiles = function () {

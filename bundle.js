@@ -49,7 +49,7 @@ var Merge = (function () {
         var lines = contents.split("\n");
         for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
             var line = lines_1[_i];
-            var include = line.match(/^\s?INCLUDE\s+(z\w+)\s*.\s*$/i);
+            var include = line.match(/^\s*INCLUDE\s+(z\w+)\s*.\s*$/i);
             if (include) {
                 output = output +
                     this.comment(include[1]) +
